@@ -294,10 +294,10 @@ $(document).ready(function() {
         xkey: 'y',
         redraw: true,
         resize: true,
-        ykeys: ['a', 'b'],
+        ykeys: ['a'],
         hideHover: 'auto',
         responsive:true,
-        labels: ['Series A', 'Series B'],
+        labels: ['Series A'],
         lineColors: ['#1de9b6', '#A389D4']
     });
     // [ line-smooth-chart ] end
