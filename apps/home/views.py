@@ -45,12 +45,17 @@ VenteDF = pd.read_sql_query(queries.VenteQuery,connection)
 
 
 MonthlySalesDF = pd.read_sql_query(queries.MonthlySalesQuery,connection)
+MonthlyPurchasesDF = pd.read_sql_query(queries.MonthlyPurchaseQuery,connection)
 
 from datetime import datetime
 
 MonthlySalesDF['YearMonth'] = pd.to_datetime(MonthlySalesDF['Date']).apply(lambda x: '{year}-{month}'.format(year=x.year,month=x.month))
 
 MonthlySalesDF = MonthlySalesDF.groupby('YearMonth')['Montant'].sum()
+
+MonthlyPurchasesDF['YearMonth'] = pd.to_datetime(MonthlyPurchasesDF['Date']).apply(lambda x: '{year}-{month}'.format(year=x.year,month=x.month))
+
+MonthlyPurchasesDF= MonthlyPurchasesDF.groupby('YearMonth')['Montant'].sum()
 
 import json
 
@@ -63,6 +68,13 @@ for index, value in MonthlySalesDF.iteritems():
 
 MonthlySalesData = json.dumps(MonthlySalesData)
 
+MonthlyPurchasesData = []
+
+for index, value in MonthlyPurchasesDF.iteritems():
+  MonthlyPurchasesData.append({'y':index,'a':value})
+MonthlyPurchasesData = json.dumps(MonthlyPurchasesData )
+
+
 CategorySalesDF = pd.read_sql_query(queries.CategorySalesQuery,connection)
 
 
@@ -74,9 +86,18 @@ for index,row in CategorySalesDF.iterrows():
 CategorySalesData = json.dumps(CategorySalesData)
 
 
+CategoryPurchasesDF = pd.read_sql_query(queries.CategoryPurchaseQuery,connection)
+
+
+CategoryPurchasesData = []
+
+for index,row in CategoryPurchasesDF.iterrows():
+    CategoryPurchasesData.append({'label':row[0],'value':row[1]})
+CategoryPurchasesData = json.dumps(CategoryPurchasesData)
+
 
 ProductSalesDF = pd.read_sql_query(queries.ProductSalesQuery,connection)
-
+ProductPurchasesDF=pd.read_sql_query(queries.ProductPurchasesQuery, connection)
 
 def df_to_json(df):
     json_records = df.reset_index().to_json(orient ='records')
@@ -103,7 +124,27 @@ for date in LaboSalesDF.YearMonth.unique():
         dict[row[1][0]]=row[1][1]
     list.append(dict)
 
+######
+FournisseurDF = pd.read_sql_query(queries.queryFournisseur,connection)
 
+FournisseurDF['YearMonth'] = FournisseurDF.Year.astype(str) + '-' + FournisseurDF.Month.astype(str)
+
+FournisseurDF= FournisseurDF.sort_values(by = ['Year','Month'])
+
+
+F_list=[]
+F_dict={}
+
+for date in FournisseurDF.YearMonth.unique():
+    F_dict={}
+    df=FournisseurDF[FournisseurDF['YearMonth'] == date]
+    F_dict['y']=date
+    for row in df.iterrows():
+        F_dict[row[1][0]]=row[1][1]
+    F_list.append(F_dict)
+print(F_list)
+
+###
 
 
 cursor.execute(queries.totalSalesQuery)
@@ -174,6 +215,19 @@ def stock(request):
     }
     html_template = loader.get_template('home/stock.html')
     return HttpResponse(html_template.render(context, request))
+
+
+login_required(login_url="/login/")
+def purchases(request):
+    context = {'segment': 'purchases',
+               'monthlypurchases': MonthlyPurchasesData,
+               'categoryPurchases' : CategoryPurchasesData ,
+               'purchasesProduct': df_to_json(ProductPurchasesDF),
+               'Fournisseur': json.dumps(F_list),
+               }
+    html_template = loader.get_template('home/purchases.html')
+    return HttpResponse(html_template.render(context, request))
+
 
 ################################################################################################
 

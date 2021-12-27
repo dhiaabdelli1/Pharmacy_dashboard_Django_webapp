@@ -82,3 +82,49 @@ Designation
   where year='2016'
   group by year, Designation order by sum([NouveauStock]) desc 
 """
+
+
+MonthlyPurchaseQuery= """
+SELECT Date, A.PrixAchatTTC*C.Qte as Montant
+
+  FROM [pharma_DW].[dbo].[FactAchat] C
+  INNER JOIN DimArticle A on C.ArticlePK = A.ArticlePK 
+   INNER JOIN DimFournisseur F on C.FournisseurPK = F.FournisseurPK 
+    INNER JOIN DimDate D on C.DatePK = D.DatePK
+"""
+
+CategoryPurchaseQuery = """
+SELECT TOP 5 A.LibelleCategorie, SUM(ROUND(A.PrixAchatTTC*V.Qte,2)) as Montant
+  FROM [pharma_DW].[dbo].[FactAchat] V 
+
+  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
+  inner join DimFournisseur b on b.FournisseurPK=V.FournisseurPK
+  inner join DimPersonnel c on c.PersonnelPK=V.PersonnelPK
+    INNER JOIN DimDate D on V.DatePK = D.DatePK GROUP BY A.LibelleCategorie ORDER BY Montant DESC
+"""
+
+ProductPurchasesQuery = """
+SELECT TOP 10 A.Designation,A.LibelleCategorie,A.PrixAchatTTC, SUM(A.PrixAchatTTC*V.Qte) as Montant, SUM(V.Qte) as Quantity
+  FROM [pharma_DW].[dbo].[FactAchat] V 
+
+  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
+   INNER JOIN DimFournisseur B ON B.FournisseurPK=V.FournisseurPK
+   inner join DimPersonnel p on p.PersonnelPK=V.PersonnelPK
+    INNER JOIN DimDate D on V.DatePK = D.DatePK GROUP BY A.Designation, A.LibelleCategorie, A.PrixAchatTTC ORDER BY Montant DESC
+"""
+
+queryFournisseur="""
+SELECT f.NomFournisseur, SUM(A.PrixAchatTTC*V.Qte) as Montant, Month, Year
+  FROM [pharma_DW].[dbo].[FactAchat] V 
+  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
+  INNER JOIN DimDate D on V.DatePK = D.DatePK 
+  inner join DimFournisseur f on F.FournisseurPK=V.FournisseurPK
+  WHERE F.NomFournisseur in (SELECT TOP 5 F.NomFournisseur
+  FROM [pharma_DW].[dbo].[FactAchat] V 
+  INNER JOIN DimFournisseur F on V.FournisseurPK = F.FournisseurPK
+  inner join DimArticle A on A.ArticlePK=V.ArticlePK
+   Group BY F.NomFournisseur ORDER BY SUM(A.PrixAchatTTC*V.Qte) DESC ) 
+  GROUP BY F.NomFournisseur, Month, Year ORDER BY Month,Year
+
+"""
+
