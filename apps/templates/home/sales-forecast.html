@@ -1,0 +1,164 @@
+{% extends "layouts/base.html" %} {% block title %} Sales Performance Dashboard {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+
+<link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Sales Forecasting</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item">Predictive Analysis</li>
+                            <li class="breadcrumb-item"><a href="javascript:">Sales Forecasting</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+                    <div class="col-xl-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Actual Daily Sales</h5>
+                            </div>
+                            <div class="card-block">
+                                <div id="morris-line-chart" style="height:300px"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Forecast Sales</h5>
+                            </div>
+                            <div class="card-block">
+                                <form>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                      <label for="formGroupExampleInput">Choose a date</label>
+                                      <input class='form-control' type="date" id="datepicker" value="2017-01-27" min="2017-01-27" max="2018-01-31">                                    </div>
+                                    <div class="form-group">
+                                      <label for="formGroupExampleInput2">Estimated Sales</label>
+                                      <input type="text" class="form-control" id="estimation" placeholder="">
+                                    </div>
+                                    
+                                  </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+
+<script src="/static/assets/plugins/chart-morris/js/raphael.min.js"></script>
+<script src="/static/assets/plugins/chart-morris/js/morris.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        var dateControl = document.querySelector('input[type="date"]');
+        dateControl.addEventListener('change', (event) => {
+           // console.log(event.target.value);
+            fetch('getEstimatedSales/', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers:{
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                    'X-CSRFToken': csrftoken,
+            },
+                body: JSON.stringify({'post_data':event.target.value}) //JavaScript object of data to POST
+            })
+            .then(response => {
+                  return response.json() //Convert response to JSON
+            })
+            .then(data => {
+            //Perform actions with the response data from the view
+            console.log(data)
+            })
+        });
+
+        //we need to fetch API to views with date as param in URL 
+        //after then we get response of estimated value and change the input holder of estimation
+
+
+        var sales = JSON.parse('{{ salesdata | escapejs }}');
+        var csales = []
+      
+        for (var key in sales) {
+               csales.push({y: key, x:Math.round(sales[key])})
+         }
+         console.log(csales)
+
+         setTimeout(function () {
+
+
+            // [ Total Sales By Month ] Start
+            Morris.Line({
+                element: 'morris-line-chart',
+                data: csales,
+                xkey: 'y',
+                redraw: true,
+                resize: true,
+                smooth: false,
+                ykeys: ['x'],
+                hideHover: 'auto',
+                responsive: true,
+                labels: ['Sales'],
+                lineColors: ['#04a9f5'],
+                xLabels: 'day',
+                yLabelFormat: function (y) {
+                    return y.toString() + ' TND';
+                }
+            });
+            // [ Total Sales By Month ] end
+         
+
+        }, 700);
+    });
+</script>
+
+{% endblock javascripts %}
