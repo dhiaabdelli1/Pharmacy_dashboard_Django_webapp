@@ -11,6 +11,7 @@ from django.urls import reverse
 
 from django.db import connections
 import os
+from pandas.core import groupby
 import pyodbc
 import pandas as pd
 
@@ -142,7 +143,7 @@ for date in FournisseurDF.YearMonth.unique():
     for row in df.iterrows():
         F_dict[row[1][0]]=row[1][1]
     F_list.append(F_dict)
-print(F_list)
+
 
 ###
 
@@ -178,7 +179,6 @@ InOutDF=InOutDF.replace({'Entrée':'In','Sortie':'Out'})
 inout_list=[]
 inout_dict={}
 
-print(InOutDF)
 
 for date in InOutDF.YearMonth.unique():
     inout_dict={}
@@ -188,7 +188,7 @@ for date in InOutDF.YearMonth.unique():
         inout_dict[row[1][2]]=row[1][3]
     inout_list.append(inout_dict)
 
-print(inout_list)
+
 
 
 stock_list=[]
@@ -205,13 +205,56 @@ for date in CategoryStockDF.YearMonth.unique():
 
 Stock2016DF=pd.read_sql_query(queries.Stock2016Query,connection)
 
+MonthlyInOutDF=pd.read_sql_query(queries.MonthlyInOutQuery,connection)
+MonthlyInOutDF['YearMonth'] = MonthlyInOutDF.Year.astype(str) + '-' + MonthlyInOutDF.Month.astype(str)
+MonthlyInOutDF = MonthlyInOutDF.sort_values(by = ['Year','Month'])
+MonthlyInOutDF=MonthlyInOutDF.replace({'Entrée':'In','Sortie':'Out'})
+
+
+
+
+
+MonthlyInData = []
+
+for index, value in MonthlyInOutDF.iteritems():
+    MonthlyInData.append({'y':index,'a':value})
+
+
+
+ms_list_in=[]
+ms_dict_in={}
+ms_list_out=[]
+ms_dict_out={}
+
+for date in MonthlyInOutDF.YearMonth.unique():
+    ms_dict_in={}
+    ms_dict_out={}
+    df_in=MonthlyInOutDF[MonthlyInOutDF['YearMonth'] == date][MonthlyInOutDF['TypeMouvement'] == 'In']
+    df_out=MonthlyInOutDF[MonthlyInOutDF['YearMonth'] == date][MonthlyInOutDF['TypeMouvement'] == 'Out']
+    ms_dict_in['y']=date
+    ms_dict_out['y']=date
+    for row in df_in.iterrows():
+        ms_dict_in['a']=row[1][3]
+    for row in df_out.iterrows():
+        ms_dict_out['a']=row[1][3]
+    ms_list_in.append(ms_dict_in)
+    ms_list_out.append(ms_dict_out)
+
+print(ms_list_in)
+print(ms_list_out)
+
+monthlyIns=json.dumps(ms_list_in)
+monthlyOuts=json.dumps(ms_list_out)
+
 
 @login_required(login_url="/login/")
 def stock(request):
     context = {'segment': 'stock',
     'CategStock': json.dumps(stock_list),
     'inout': json.dumps(inout_list),
-    'stock2016': df_to_json(Stock2016DF)
+    'stock2016': df_to_json(Stock2016DF),
+    'monthlyIns':monthlyIns,
+    'monthlyOuts':monthlyOuts
     }
     html_template = loader.get_template('home/stock.html')
     return HttpResponse(html_template.render(context, request))

@@ -82,6 +82,15 @@ Designation
   where year='2016'
   group by year, Designation order by sum([NouveauStock]) desc 
 """
+MonthlyInOutQuery="""
+SELECT Month
+	  ,Year
+      ,[TypeMouvement]
+      ,SUM(ABS([Qte])) Qte
+  FROM [pharma_DW].[dbo].[FactStock] as fs
+  inner join DimDate as d on d.DatePK=fs.DatePK
+  where TypeMouvement <> 'Modification'
+  group by TypeMouvement, Month, Year"""
 
 
 MonthlyPurchaseQuery= """
