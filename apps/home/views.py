@@ -6,6 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import JsonResponse
 from django.template import loader
 from django.urls import reverse
 
@@ -215,3 +216,37 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
+
+
+
+######## SALES FORECASTING ##########
+
+sales_df = pd.read_csv('./staticfiles/sales.csv',parse_dates=['Date'],index_col=['Date'],encoding='utf-16')
+sales_df.rename(columns={'TotalTTC':'total_sales'},inplace=True)
+sales_ts = sales_df['total_sales'].resample('D', level=0).sum()
+sales_ts= sales_ts.replace(to_replace=0,value=sales_df['total_sales'].mean())
+sales_ts.index = sales_ts.index.strftime('%Y-%m-%d')
+
+
+@login_required(login_url="/login/")
+def sales_forecasting(request):
+    context = {'segment': 'sales-forecasting','salesdata':sales_ts.to_json()}
+    html_template = loader.get_template('home/sales-forecast.html')
+    return HttpResponse(html_template.render(context, request))
+
+
+# a fetch api to get the estimated value to print in the template 
+# a function to get date then go to prediction and return the vlaue 
+
+
+from django.http import JsonResponse
+
+
+def forecastSales(edate):
+    return 20000
+
+@login_required(login_url="/login/")
+def getEstimatedSales(request):
+    edate = json.load(request)['post_data']
+    estimation = forecastSales(edate)
+    return JsonResponse({'date':edate,'estimation':estimation})
