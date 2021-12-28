@@ -12,8 +12,11 @@ from django.urls import reverse
 
 from django.db import connections
 import os
+from pandas.core import groupby
 import pyodbc
 import pandas as pd
+
+from apps.home import queries
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -31,43 +34,30 @@ dw_database='pharma_DW'
 connection = pyodbc.connect('DRIVER={'+driver+'};SERVER='+server+';DATABASE='+dw_database+';Trusted_Connection=yes;')
 cursor=connection.cursor()
 
-ClientQuery="""
-SELECT [ClientPK]
-      ,[CNSS]
-  FROM [pharma_DW].[dbo].[DimClient]
-"""
 
-ClientDF = pd.read_sql_query(ClientQuery,connection)
+
+ClientDF = pd.read_sql_query(queries.ClientQuery,connection)
 
 
 
 ################################################################################################
  
-VenteQuery = """SELECT * 
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimClient C on V.ClientPK = C.ClientPK
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
-   INNER JOIN DimMutuelle M on V.MutuellePK = M.MutuellePK 
-    INNER JOIN DimDate D on V.DatePK = D.DatePK  """
-VenteDF = pd.read_sql_query(VenteQuery,connection)
+
+VenteDF = pd.read_sql_query(queries.VenteQuery,connection)
 
 
-MonthlySalesQuery = """SELECT Date, A.PrixVenteTTC*V.Qte as Montant
-
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimClient C on V.ClientPK = C.ClientPK
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
-   INNER JOIN DimMutuelle M on V.MutuellePK = M.MutuellePK 
-    INNER JOIN DimDate D on V.DatePK = D.DatePK """
-
-
-MonthlySalesDF = pd.read_sql_query(MonthlySalesQuery,connection)
+MonthlySalesDF = pd.read_sql_query(queries.MonthlySalesQuery,connection)
+MonthlyPurchasesDF = pd.read_sql_query(queries.MonthlyPurchaseQuery,connection)
 
 from datetime import datetime
 
 MonthlySalesDF['YearMonth'] = pd.to_datetime(MonthlySalesDF['Date']).apply(lambda x: '{year}-{month}'.format(year=x.year,month=x.month))
 
 MonthlySalesDF = MonthlySalesDF.groupby('YearMonth')['Montant'].sum()
+
+MonthlyPurchasesDF['YearMonth'] = pd.to_datetime(MonthlyPurchasesDF['Date']).apply(lambda x: '{year}-{month}'.format(year=x.year,month=x.month))
+
+MonthlyPurchasesDF= MonthlyPurchasesDF.groupby('YearMonth')['Montant'].sum()
 
 import json
 
@@ -80,17 +70,14 @@ for index, value in MonthlySalesDF.iteritems():
 
 MonthlySalesData = json.dumps(MonthlySalesData)
 
+MonthlyPurchasesData = []
+
+for index, value in MonthlyPurchasesDF.iteritems():
+  MonthlyPurchasesData.append({'y':index,'a':value})
+MonthlyPurchasesData = json.dumps(MonthlyPurchasesData )
 
 
-CategorySalesQuery = """SELECT TOP 5 A.LibelleCategorie, SUM(ROUND(A.PrixVenteTTC*V.Qte,2)) as Montant
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimClient C on V.ClientPK = C.ClientPK
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
-   INNER JOIN DimMutuelle M on V.MutuellePK = M.MutuellePK 
-    INNER JOIN DimDate D on V.DatePK = D.DatePK GROUP BY A.LibelleCategorie ORDER BY Montant DESC
-"""
-
-CategorySalesDF = pd.read_sql_query(CategorySalesQuery,connection)
+CategorySalesDF = pd.read_sql_query(queries.CategorySalesQuery,connection)
 
 
 CategorySalesData = []
@@ -98,22 +85,21 @@ CategorySalesData = []
 for index,row in CategorySalesDF.iterrows():
     CategorySalesData.append({'label':row[0],'value':row[1]})
 
-
-
-
 CategorySalesData = json.dumps(CategorySalesData)
 
 
-ProductSalesQuery = """SELECT TOP 10 A.Designation,A.LibelleCategorie,A.PrixVenteTTC, SUM(A.PrixVenteTTC*V.Qte) as Montant, SUM(V.Qte) as Quantity
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimClient C on V.ClientPK = C.ClientPK
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
-   INNER JOIN DimMutuelle M on V.MutuellePK = M.MutuellePK 
-    INNER JOIN DimDate D on V.DatePK = D.DatePK GROUP BY A.Designation, A.LibelleCategorie, A.PrixVenteTTC ORDER BY Montant DESC"""
+CategoryPurchasesDF = pd.read_sql_query(queries.CategoryPurchaseQuery,connection)
 
 
-ProductSalesDF = pd.read_sql_query(ProductSalesQuery,connection)
+CategoryPurchasesData = []
 
+for index,row in CategoryPurchasesDF.iterrows():
+    CategoryPurchasesData.append({'label':row[0],'value':row[1]})
+CategoryPurchasesData = json.dumps(CategoryPurchasesData)
+
+
+ProductSalesDF = pd.read_sql_query(queries.ProductSalesQuery,connection)
+ProductPurchasesDF=pd.read_sql_query(queries.ProductPurchasesQuery, connection)
 
 def df_to_json(df):
     json_records = df.reset_index().to_json(orient ='records')
@@ -122,20 +108,7 @@ def df_to_json(df):
     return data
 
 
-
-
-LaboSalesQuery = """SELECT  A.LibelleForme,SUM(A.PrixVenteTTC*V.Qte) as Montant, Month, Year
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK 
-  INNER JOIN DimDate D on V.DatePK = D.DatePK 
-  WHERE A.LibelleForme in (SELECT TOP 5 A.LibelleForme
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK GROUP BY A.LibelleForme ORDER BY SUM(A.PrixVenteTTC*V.Qte) DESC ) 
-  GROUP BY A.LibelleForme, Month, Year ORDER BY Month,Year"""
-
-
-
-LaboSalesDF = pd.read_sql_query(LaboSalesQuery,connection)
+LaboSalesDF = pd.read_sql_query(queries.LaboSalesQuery,connection)
 
 LaboSalesDF['YearMonth'] = LaboSalesDF.Year.astype(str) + '-' + LaboSalesDF.Month.astype(str)
 
@@ -153,14 +126,30 @@ for date in LaboSalesDF.YearMonth.unique():
         dict[row[1][0]]=row[1][1]
     list.append(dict)
 
+######
+FournisseurDF = pd.read_sql_query(queries.queryFournisseur,connection)
 
-totalSalesQuery = """
-SELECT  SUM(A.PrixVenteTTC*V.Qte) as TOTAL
-  FROM [pharma_DW].[dbo].[FactVente] V 
-  INNER JOIN DimArticle A on V.ArticlePK = A.ArticlePK ;
-  """
+FournisseurDF['YearMonth'] = FournisseurDF.Year.astype(str) + '-' + FournisseurDF.Month.astype(str)
 
-cursor.execute(totalSalesQuery)
+FournisseurDF= FournisseurDF.sort_values(by = ['Year','Month'])
+
+
+F_list=[]
+F_dict={}
+
+for date in FournisseurDF.YearMonth.unique():
+    F_dict={}
+    df=FournisseurDF[FournisseurDF['YearMonth'] == date]
+    F_dict['y']=date
+    for row in df.iterrows():
+        F_dict[row[1][0]]=row[1][1]
+    F_list.append(F_dict)
+
+
+###
+
+
+cursor.execute(queries.totalSalesQuery)
 total_sales = cursor.fetchone()
 
 
@@ -177,6 +166,111 @@ def sales(request):
     return HttpResponse(html_template.render(context, request))
 
 
+################################################################################################
+
+CategoryStockDF=pd.read_sql_query(queries.CategoryStockQuery,connection)
+CategoryStockDF['YearMonth'] = CategoryStockDF.Year.astype(str) + '-' + CategoryStockDF.Month.astype(str)
+CategoryStockDF = CategoryStockDF.sort_values(by = ['Year','Month'])
+
+InOutDF=pd.read_sql_query(queries.InOutQuery,connection)
+InOutDF['YearMonth'] = InOutDF.Year.astype(str) + '-' + InOutDF.Month.astype(str)
+InOutDF = InOutDF.sort_values(by = ['Year','Month'])
+InOutDF=InOutDF.replace({'Entrée':'In','Sortie':'Out'})
+
+inout_list=[]
+inout_dict={}
+
+
+for date in InOutDF.YearMonth.unique():
+    inout_dict={}
+    df=InOutDF[InOutDF['YearMonth'] == date]
+    inout_dict['y']=date
+    for row in df.iterrows():
+        inout_dict[row[1][2]]=row[1][3]
+    inout_list.append(inout_dict)
+
+
+
+
+stock_list=[]
+stock_dict={}
+
+for date in CategoryStockDF.YearMonth.unique():
+    stock_dict={}
+    df=CategoryStockDF[CategoryStockDF['YearMonth'] == date]
+    stock_dict['y']=date
+    for row in df.iterrows():
+        stock_dict[row[1][0]]=row[1][1]
+    stock_list.append(stock_dict)
+
+
+Stock2016DF=pd.read_sql_query(queries.Stock2016Query,connection)
+
+MonthlyInOutDF=pd.read_sql_query(queries.MonthlyInOutQuery,connection)
+MonthlyInOutDF['YearMonth'] = MonthlyInOutDF.Year.astype(str) + '-' + MonthlyInOutDF.Month.astype(str)
+MonthlyInOutDF = MonthlyInOutDF.sort_values(by = ['Year','Month'])
+MonthlyInOutDF=MonthlyInOutDF.replace({'Entrée':'In','Sortie':'Out'})
+
+
+
+
+
+MonthlyInData = []
+
+for index, value in MonthlyInOutDF.iteritems():
+    MonthlyInData.append({'y':index,'a':value})
+
+
+
+ms_list_in=[]
+ms_dict_in={}
+ms_list_out=[]
+ms_dict_out={}
+
+for date in MonthlyInOutDF.YearMonth.unique():
+    ms_dict_in={}
+    ms_dict_out={}
+    df_in=MonthlyInOutDF[MonthlyInOutDF['YearMonth'] == date][MonthlyInOutDF['TypeMouvement'] == 'In']
+    df_out=MonthlyInOutDF[MonthlyInOutDF['YearMonth'] == date][MonthlyInOutDF['TypeMouvement'] == 'Out']
+    ms_dict_in['y']=date
+    ms_dict_out['y']=date
+    for row in df_in.iterrows():
+        ms_dict_in['a']=row[1][3]
+    for row in df_out.iterrows():
+        ms_dict_out['a']=row[1][3]
+    ms_list_in.append(ms_dict_in)
+    ms_list_out.append(ms_dict_out)
+
+print(ms_list_in)
+print(ms_list_out)
+
+monthlyIns=json.dumps(ms_list_in)
+monthlyOuts=json.dumps(ms_list_out)
+
+
+@login_required(login_url="/login/")
+def stock(request):
+    context = {'segment': 'stock',
+    'CategStock': json.dumps(stock_list),
+    'inout': json.dumps(inout_list),
+    'stock2016': df_to_json(Stock2016DF),
+    'monthlyIns':monthlyIns,
+    'monthlyOuts':monthlyOuts
+    }
+    html_template = loader.get_template('home/stock.html')
+    return HttpResponse(html_template.render(context, request))
+
+
+login_required(login_url="/login/")
+def purchases(request):
+    context = {'segment': 'purchases',
+               'monthlypurchases': MonthlyPurchasesData,
+               'categoryPurchases' : CategoryPurchasesData ,
+               'purchasesProduct': df_to_json(ProductPurchasesDF),
+               'Fournisseur': json.dumps(F_list),
+               }
+    html_template = loader.get_template('home/purchases.html')
+    return HttpResponse(html_template.render(context, request))
 
 
 ################################################################################################
