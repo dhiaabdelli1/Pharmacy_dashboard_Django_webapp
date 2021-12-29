@@ -33,35 +33,122 @@
             <div class="page-wrapper">
                 <!-- [ Main Content ] start -->
                 <div class="row">
-                    <div class="col-xl-9">
+                    <div class="col-md-3">
+                        <div class="card user-list">
+                            <div class="card-header">
+                                <h5>Model Information</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="row align-items-center justify-content-center m-b-20">
+                                    <div class="col-6">
+                                        <h2 class="f-w-200 d-flex align-items-center float-left m-0">SARIMAX</h2>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i class="fas fa-crosshairs f-15 m-r-10 text-c-yellow"></i>Accuarcy</h6>
+                                        <h6 class="align-items-center float-right">384</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i class="fas fa-star f-10 m-r-10 text-c-yellow"></i>4</h6>
+                                        <h6 class="align-items-center float-right">145</h6>
+                                        <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i class="fas fa-star f-10 m-r-10 text-c-yellow"></i>3</h6>
+                                        <h6 class="align-items-center float-right">24</h6>
+                                        <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i class="fas fa-star f-10 m-r-10 text-c-yellow"></i>2</h6>
+                                        <h6 class="align-items-center float-right">1</h6>
+                                        <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Forecast Sales</h5>
+                            </div>
+                            <div class="card-block col-md-11">
+                                <p style="color:black">Forecasting by Day : </p>
+                                <form>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="formGroupExampleInput">Choose a date</label>
+                                        <input class='form-control' type="date" id="datepicker" value="2017-01-27"
+                                            min="2017-01-27" max="2018-01-31"> </div>
+                                    <div class="form-group">
+                                        <label for="formGroupExampleInput2">Estimated Sales</label>
+                                        <input type="text" class="form-control" id="estimation" placeholder="">
+                                    </div>
+
+                                </form>
+                                <p style="color:black">Forecasting by Range : </p>
+                                <form>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="formGroupExampleInput">Choose a start date</label>
+                                        <input class='form-control' type="date" id="datepicker-start" value="2017-01-27"
+                                            min="2017-01-27" max="2018-01-31">
+
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label for="formGroupExampleInput">Choose an end date</label>
+                                        <input class='form-control' type="date" id="datepicker-end" value="2017-02-05"
+                                            min="2017-01-27" max="2018-01-31">
+                                            
+                                    </div>
+                                
+                                    <button type="button" class="btn btn-success btn-lg btn-block" id="forecastbtn">Forecast</button>
+                             
+                                </form>
+                            </div>
+                        </div>
+           
+                            
+   
+
+                    </div>
+                    <div class="col-md-9">
+
                         <div class="card">
                             <div class="card-header">
                                 <h5>Actual Daily Sales</h5>
                             </div>
                             <div class="card-block">
+
                                 <div id="morris-line-chart" style="height:300px"></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xl-3">
+
+
                         <div class="card">
                             <div class="card-header">
-                                <h5>Forecast Sales</h5>
+                                <h5>Forecasted Sales</h5>
                             </div>
                             <div class="card-block">
-                                <form>
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                      <label for="formGroupExampleInput">Choose a date</label>
-                                      <input class='form-control' type="date" id="datepicker" value="2017-01-27" min="2017-01-27" max="2018-01-31">                                    </div>
-                                    <div class="form-group">
-                                      <label for="formGroupExampleInput2">Estimated Sales</label>
-                                      <input type="text" class="form-control" id="estimation" placeholder="">
-                                    </div>
-                                    
-                                  </form>
+                                <div id="future-chart" style="height:300px"></div>
                             </div>
                         </div>
+                 
+
+
                     </div>
                 </div>
                 <!-- [ Main Content ] end -->
@@ -99,44 +186,150 @@
         }
         const csrftoken = getCookie('csrftoken');
 
-        var dateControl = document.querySelector('input[type="date"]');
-        dateControl.addEventListener('change', (event) => {
-           // console.log(event.target.value);
-            fetch('getEstimatedSales/', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers:{
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
-                    'X-CSRFToken': csrftoken,
+
+
+        
+        fetch('getEstimatedSales/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                'X-CSRFToken': csrftoken,
             },
-                body: JSON.stringify({'post_data':event.target.value}) //JavaScript object of data to POST
-            })
-            .then(response => {
-                  return response.json() //Convert response to JSON
-            })
-            .then(data => {
+            body: JSON.stringify({
+                'post_data': '2017-01-27'
+            }) //JavaScript object of data to POST
+        })
+        .then(response => {
+            return response.json() //Convert response to JSON
+        })
+        .then(data => {
             //Perform actions with the response data from the view
             console.log(data)
-            })
+            document.getElementById('estimation').value = Math.round(data.estimation) +
+                ' TND'
+        })
+
+        var dateControl = document.getElementById('datepicker');
+        dateControl.addEventListener('change', (event) => {
+            // console.log(event.target.value);
+            fetch('getEstimatedSales/', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        'post_data': event.target.value
+                    }) //JavaScript object of data to POST
+                })
+                .then(response => {
+                    return response.json() //Convert response to JSON
+                })
+                .then(data => {
+                    //Perform actions with the response data from the view
+                    console.log(data)
+                    document.getElementById('estimation').value = Math.round(data.estimation) +
+                        ' TND'
+                })
         });
 
-        //we need to fetch API to views with date as param in URL 
-        //after then we get response of estimated value and change the input holder of estimation
+        // [START forecasting by range ] 
+        var default_forecast_data;
+        fetch('getEstimatedSalesByRange/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                
+                'post_data': {start:'2017-01-27', end:'2017-02-05'}
+            }) //JavaScript object of data to POST
+        })
+        .then(response => {
+            return response.json() //Convert response to JSON
+        })
+        .then(data => {
+            //Perform actions with the response data from the view
+            dafault_forecast_data = data 
+        })
 
+
+        
+        setTimeout(function () {
+            forecastGraph =   Morris.Line({
+                element: 'future-chart',
+                data: dafault_forecast_data,
+                xkey: 'y',
+                redraw: true,
+                resize: true,
+                smooth: false,
+                ykeys: ['x'],
+                hideHover: 'auto',
+                responsive: true,
+                labels: ['Sales'],
+                lineColors: ['#ffa600'],
+                xLabels: 'day',
+                yLabelFormat: function (y) {
+                    return Math.round(y).toString() + ' TND';
+                }
+            });
+
+
+        }, 700);
+
+        var forecastbtn = document.getElementById('forecastbtn');
+        forecastbtn.addEventListener('click', (event) => {
+            // console.log(event.target.value);
+            var endDate = document.getElementById('datepicker-end');
+            var startDate = document.getElementById('datepicker-start');
+            fetch('getEstimatedSalesByRange/', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        
+                        'post_data': {start:startDate.value, end:endDate.value}
+                    }) //JavaScript object of data to POST
+                })
+                .then(response => {
+                    return response.json() //Convert response to JSON
+                })
+                .then(data => {
+                    //Perform actions with the response data from the view
+                    forecastGraph.setData(data)
+        
+                })
+        });
+
+
+        // [END forecasting by range ]
 
         var sales = JSON.parse('{{ salesdata | escapejs }}');
         var csales = []
-      
+
         for (var key in sales) {
-               csales.push({y: key, x:Math.round(sales[key])})
-         }
-         console.log(csales)
+            csales.push({
+                y: key,
+                x: Math.round(sales[key])
+            })
+        }
 
-         setTimeout(function () {
+
+        setTimeout(function () {
 
 
-            // [ Total Sales By Month ] Start
+            
             Morris.Line({
                 element: 'morris-line-chart',
                 data: csales,
@@ -154,8 +347,9 @@
                     return y.toString() + ' TND';
                 }
             });
-            // [ Total Sales By Month ] end
-         
+       
+      
+
 
         }, 700);
     });

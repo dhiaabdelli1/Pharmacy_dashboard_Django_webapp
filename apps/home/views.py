@@ -1,8 +1,3 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
@@ -335,12 +330,26 @@ def sales_forecasting(request):
 
 from django.http import JsonResponse
 
-
-def forecastSales(edate):
-    return 20000
+from .mlmodels import salesforecast as sf
 
 @login_required(login_url="/login/")
 def getEstimatedSales(request):
-    edate = json.load(request)['post_data']
-    estimation = forecastSales(edate)
-    return JsonResponse({'date':edate,'estimation':estimation})
+    date = json.load(request)['post_data']
+    estimation = sf.predictSales(date)
+    return JsonResponse({'date':date,'estimation':estimation[-1]})
+
+
+
+
+@login_required(login_url="/login/")
+def getEstimatedSalesByRange(request):
+    params = json.load(request)['post_data']
+    estimation = sf.predictSales(params['end'])
+    estimation = pd.Series(estimation)
+    estimation.index = estimation.index.strftime('%Y-%m-%d')
+    estimation = estimation[params['start']:params['end']]
+    data = []
+    for index, value in estimation.iteritems():
+        data.append({'y':index,'x':value})
+
+    return JsonResponse(data,safe=False)

@@ -8,6 +8,7 @@ urlpatterns = [
     path('sales/', views.sales, name='sales'),
     path('sales-forecasting/', views.sales_forecasting, name='sales-forecast'),
     path('sales-forecasting/getEstimatedSales/', views.getEstimatedSales, name='api-getestimatedsales'),
+    path('sales-forecasting/getEstimatedSalesByRange/', views.getEstimatedSalesByRange, name='api-getestimatedsalesbyrange'),
     path('stock/', views.stock, name='stock'),
     path('purchases/', views.purchases, name='purchases'),
 
