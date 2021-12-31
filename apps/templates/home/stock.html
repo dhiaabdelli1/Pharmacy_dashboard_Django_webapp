@@ -1,13 +1,10 @@
-{% extends "layouts/base.html" %} {% block title %} Sales Performance Dashboard
+{% extends "layouts/base.html" %} {% block title %} Stock
 {% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
 
-<link
-  rel="stylesheet"
-  href="/static/assets/plugins/chart-morris/css/morris.css"
-/>
+<link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css" />
 
 {% endblock stylesheets %} {% block content %}
 
@@ -19,14 +16,14 @@
         <div class="row align-items-center">
           <div class="col-md-12">
             <div class="page-header-title">
-              <h5 class="m-b-10">Stock Dashboard</h5>
+              <h5 class="m-b-10">Stock</h5>
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item">
                 <a href="/"><i class="feather icon-home"></i></a>
               </li>
               <li class="breadcrumb-item">
-                <a href="javascript:">Stock</a>
+                <a href="javascript:">Stock Performance</a>
               </li>
             </ul>
           </div>
@@ -39,20 +36,20 @@
         <!-- [ Main Content ] start -->
         <div class="row">
           <!--[ year  sales section ] starts-->
-          
+
           <!--[ year  sales section ] end-->
           <!--[ Monthly  sales section ] starts-->
-          
+
           <!--[ Monthly  sales section ] end-->
 
           <!--[ Monthly target ] starts-->
-         
+
           <!--[ Monthly target ] end-->
           <!--[ target pourcentage ] starts-->
-          
+
           <!--[ target pourcentage ] end-->
 
-          <div class="col-xl-8">
+          <div class="col-md-6">
             <div class="card">
               <div class="card-header">
                 <div class="d-flex justify-content-between">
@@ -66,30 +63,27 @@
                 </div>
               </div>
               <div class="card-block" id="stock-in-out-chart">
-                <div
-                  id="morris-line-chart-stock"
-                  class="ChartShadow"
-                  style="height: 300px"
-                ></div>
+                <div id="morris-line-chart-stock" class="ChartShadow" style="height: 300px"></div>
               </div>
             </div>
           </div>
-
-          <!-- [ Top 5 Categories In Sales ] start -->
-          <div class="col-xl-4">
+          <div class="col-md-6">
             <div class="card">
               <div class="card-header">
-                <h5 class="font-weight-bold">Top 5 Categories in Stock Movement</h5>
+                <h5 class="font-weight-bold">Top 5 Categories By Month</h5>
               </div>
               <div class="card-block">
-                <div id="morris-donut-chart" style="height: 300px"></div>
+                <div id="morris-bar-chart" style="height: 300px"></div>
               </div>
             </div>
           </div>
 
-          <!-- [ Top 5 Categories In Sales ] end -->
 
-          <div class="col-sm-8">
+       
+
+
+          
+          <div class="col-sm-7">
             <div class="card">
               <div class="card-header">
                 <h5 class="font-weight-bold">
@@ -118,17 +112,18 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-8">
+          <div class="col-md-5">
             <div class="card">
               <div class="card-header">
-                <h5>Predict</h5>
+                <h5 class="font-weight-bold">Top 5 Categories In Stock</h5>
               </div>
               <div class="card-block">
-                <div id="morris-bar-chart" style="height: 300px"></div>
+                <div id="morris-donut-chart" style="height:300px"></div>
               </div>
             </div>
           </div>
-          
+         
+
         </div>
         <!-- [ Main Content ] end -->
       </div>
@@ -151,12 +146,15 @@
     var inout = JSON.parse("{{ inout | escapejs }}");
     var monthlyIns = JSON.parse("{{ monthlyIns | escapejs }}");
     var monthlyOuts = JSON.parse("{{ monthlyOuts | escapejs }}");
+
+
+    var topcatstock = JSON.parse("{{ topcatinstock | escapejs }}");
+
+    console.log(topcatstock);
     var mouvements = ["In", "Out"];
 
     var inoutdata = monthlyIns;
 
-    console.log(monthlyIns);
-    console.log(monthlyOuts);
 
     var select = document.getElementById("exampleFormControlSelect1");
 
@@ -193,6 +191,22 @@
 
     setTimeout(function () {
       load_morris_lien_chart(monthlyIns);
+            // [ Donut-chart ] Start
+            var graph = Morris.Donut({
+              element: 'morris-donut-chart',
+              data: topcatstock,
+              colors: [
+                '#1de9b6',
+                '#A389D4',
+                '#04a9f5',
+                '#1dc4e9',
+              ],
+              resize: true,
+              formatter: function (y, data) {
+                return y + 'TND'
+              }
+            });
+            // [ Donut-chart ] end
       Morris.Bar({
         element: "morris-bar-chart",
         data: CategStock,
@@ -230,6 +244,9 @@
         ],
       });
       // [ bar-simple ] chart end
+
+
+
     }, 700);
   });
 </script>

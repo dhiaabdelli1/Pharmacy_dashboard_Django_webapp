@@ -141,6 +141,7 @@ for date in FournisseurDF.YearMonth.unique():
     F_list.append(F_dict)
 
 
+print(F_list)
 ###
 
 
@@ -236,11 +237,27 @@ for date in MonthlyInOutDF.YearMonth.unique():
     ms_list_in.append(ms_dict_in)
     ms_list_out.append(ms_dict_out)
 
-print(ms_list_in)
-print(ms_list_out)
-
 monthlyIns=json.dumps(ms_list_in)
 monthlyOuts=json.dumps(ms_list_out)
+
+
+
+
+
+
+CategoryStockDF = pd.read_sql(queries.queryTopCategoriesInStock,connection)
+
+
+CategoryStockData = []
+
+for index,row in CategoryStockDF.iterrows():
+    CategoryStockData.append({'label':row[0],'value':row[1]})
+
+CategoryStockData = json.dumps(CategoryStockData)
+
+
+print(CategoryStockData)
+
 
 
 @login_required(login_url="/login/")
@@ -250,7 +267,8 @@ def stock(request):
     'inout': json.dumps(inout_list),
     'stock2016': df_to_json(Stock2016DF),
     'monthlyIns':monthlyIns,
-    'monthlyOuts':monthlyOuts
+    'monthlyOuts':monthlyOuts,
+    'topcatinstock':CategoryStockData
     }
     html_template = loader.get_template('home/stock.html')
     return HttpResponse(html_template.render(context, request))
@@ -277,7 +295,6 @@ def index(request):
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
-
 
 
 
@@ -330,7 +347,7 @@ def sales_forecasting(request):
 
 from django.http import JsonResponse
 
-from .mlmodels import salesforecast as sf
+from .mlmodels import mlmodels as sf
 
 @login_required(login_url="/login/")
 def getEstimatedSales(request):
@@ -353,3 +370,99 @@ def getEstimatedSalesByRange(request):
         data.append({'y':index,'x':value})
 
     return JsonResponse(data,safe=False)
+
+
+
+
+###################### PRICE PREDICTION ##################
+
+import sklearn
+import joblib
+from sklearn.preprocessing import StandardScaler
+
+
+
+@login_required(login_url="/login/")
+def price_prediction(request):
+    context = {'segment': 'price-prediction'}
+    html_template = loader.get_template('home/price-prediction.html')
+    return HttpResponse(html_template.render(context, request))
+
+@login_required(login_url="/login/")
+def getPredictedPrice(request):
+    params = json.load(request)['post_data']
+    predicted = sf.predictPrice(params['actualprice'])
+    return JsonResponse(predicted, safe=False)
+
+
+############################ CNSS CLASSIFIER ###########################
+
+def fetchDataset():
+    FactVente = pd.read_csv(
+        './apps/home/data/FactVente.csv', encoding='utf-16')
+    DimArticle = pd.read_csv(
+        './apps/home/data/DimArticle.csv', encoding='utf-16')
+    DimClient = pd.read_csv(
+        './apps/home/data/DimClient.csv', encoding='utf-16')
+    VenteDF = pd.merge(DimArticle, FactVente, on='ArticlePK')
+    VenteDF = pd.merge(VenteDF, DimClient, on='ClientPK')
+    VenteDF = VenteDF[['TotalTTC', 'Qte',
+                       'TotalRemise', 'LibelleCategorie', 'CNSS']]
+    return VenteDF
+
+
+def preprocess(row, df):
+    df.drop(columns=['CNSS'], inplace=True)
+    VenteDF = df.append(row, ignore_index=True)
+    df = pd.get_dummies(df, columns=['LibelleCategorie'])
+    scaler = StandardScaler()
+    client = df.iloc[-1].tolist()
+    list = []
+    list.append(client)
+    scaler.fit(list)
+    list = scaler.transform(list)
+    return list
+
+
+def FormView(request):
+    categs = ['GTTE BUVABLE', 'SIROP ANTITUSSIF', 'POMMADE', 'CP ANTIBIOTIQUE',
+              'CP', 'COLLUTOIRE', 'SIROP', 'PDE OPHT', 'GTTE NASALE', 'SUPPO',
+              'SIROP   ANTIBIOTIQUE', 'COLLYRE', 'SACHET BUVABLE', 'GRANULES',
+              'GTTE AURIC', 'GYNECO', 'TOILETTE', 'LAIT_FARINE', 'DIETETIQUE',
+              'PANSEMENT', 'DENTAIRE', 'SERINGUE', 'ACCESS', 'SERUM', 'INJ',
+              'ORTHOPEDIE', 'VET', 'HYGIENE INTIME', 'AMP BUVABLE',
+              'GTTE HOMEOPATHIE', 'DOSE', 'INJ ANTIBIOTIQUE', 'US_EXT',
+              'TEXTILE', 'NATURE', 'MAISON', 'VACCIN', 'FORMULE', 'INHALATION',
+              'SACHET ANTIBIOTIQUE', 'PRESERVATIF', 'GEL-SOLUTE BUCCAL',
+              'CP HOMEOPATHIE', 'B. BOUCHE', 'BEBE', 'TEINTURE MERE', 'SABOT',
+              'Divers', 'CAPSULE', 'RECIP']
+
+    context = {'categs': categs}
+    if request.method == 'POST':
+        totalttc = request.POST.get('totalttc')
+        qte = request.POST.get('qte')
+        totalremise = request.POST.get('totalremise')
+        libellecategorie = request.POST.get('libellecategorie')
+        new_row = {'TotalTTC': totalttc, 'Qte': qte,
+                   'TotalRemise': totalremise, 'LibelleCategorie': libellecategorie}
+
+        # fetching original dataset
+        VenteDF = fetchDataset()
+
+        # preprocessing
+        list = preprocess(new_row, VenteDF)
+
+        # importing model and making prediction
+        knn_model = joblib.load('./staticfiles/knn.sav')
+        prediction = knn_model.predict(list)
+        context['prediction'] = prediction[0]
+        html_template = loader.get_template('home/knn-predict.html')
+        return HttpResponse(html_template.render(context, request))
+    else:
+        context['Prediction'] = ''
+        html_template = loader.get_template('home/knn-predict.html')
+        return HttpResponse(html_template.render(context, request))
+
+
+
+

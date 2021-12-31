@@ -137,3 +137,7 @@ SELECT f.NomFournisseur, SUM(A.PrixAchatTTC*V.Qte) as Montant, Month, Year
 
 """
 
+queryTopCategoriesInStock = """
+SELECT TOP 5 LibelleCategorie, SUM(ABS([Qte])) as Quantity FROM [pharma_DW].[dbo].[FactStock] as fs
+  inner join DimArticle as a on fs.ArticlePK=a.ArticlePK group by LibelleCategorie order by SUM(ABS([Qte])) DESC
+  """

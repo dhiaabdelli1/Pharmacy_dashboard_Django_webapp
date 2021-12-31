@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %} {% block title %} Sales Performance Dashboard {% endblock %}
+{% extends "layouts/base.html" %} {% block title %}Purchases{% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
@@ -17,7 +17,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-12">
                         <div class="page-header-title">
-                            <h5 class="m-b-10">Purchases Performance Dashboard</h5>
+                            <h5 class="m-b-10">Purchases</h5>
                         </div>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
@@ -28,17 +28,7 @@
             </div>
         </div>
 
-    <div class="card h-100 p-3">
-            <div class="overflow-hidden position-relative border-radius-lg bg-cover h-100" style="background-image: url('/static/assets/images/widget/front2.jpg'); ">
-              <span class="mask bg-gradient-dark"></span>
-              <div class="card-body position-relative z-index-1 d-flex flex-column h-100 p-3">
-                <h5 class="text-white font-weight-bolder mb-4 pt-2">Overview On Purchases</h5>
-                <p class="text-black-50  font-weight-bold mb-lg-2 pt-6">Explore the general information on the sale of fact that summarizes the most prominent measures and the different elements involved.
-                    We will find here the different Categories of  items, Evaluation of revenue over time, </p></div>
-                  <div class="container-fluid py-4">
-                  </div>
-            </div>
- </div>
+
         <!-- [ breadcrumb ] end -->
         <div class="main-body">
             <div class="page-wrapper">
@@ -48,7 +38,7 @@
                     <div class="col-md-4 col-xl-3">
                         <div class="card yearly-sales">
                             <div class="card-block">
-                                <h5 class="mb-4 font-weight-bold">Total Sales</h5>
+                                <h5 class="mb-4 font-weight-bold">Total Purchases</h5>
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
@@ -66,78 +56,55 @@
                     <div class="col-md-4 col-xl-3">
                         <div class="card Monthly-sales">
                             <div class="card-block">
-                                <h5 class="mb-4 font-weight-bold">Monthly Purchases</h5>
+                                <h5 class="mb-4 font-weight-bold">This Month Purchases</h5>
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
-                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>$ 2.942.32
+                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>4134581 TND
                                         </h3>
                                     </div>
-                                    <div class="col-3 text-right">
-                                        <p class="m-b-0">36%</p>
-                                    </div>
+                            
                                 </div>
-                                <div class="progress m-t-30" style="height: 7px;">
-                                    <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 35%;"
-                                        aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
+                        
                             </div>
                         </div>
                     </div>
                     <!--[ Monthly  sales section ] end-->
-
-                    <!--[ Monthly target ] starts-->
                     <div class="col-md-4 col-xl-3">
-                        <div class="card monthly-target">
+                        <div class="card Monthly-sales">
                             <div class="card-block">
-                                <h5 class="mb-4 font-weight-bold">Monthly Target</h5>
+                                <h5 class="mb-4 font-weight-bold">Total Suppliers</h5>
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
-                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>$ 2.942.32
+                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>47
                                         </h3>
                                     </div>
-                                    <div class="col-3 text-right">
-                                        <p class="m-b-0">36%</p>
-                                    </div>
+                            
                                 </div>
-                                <div class="progress m-t-30" style="height: 7px;">
-                                    <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 35%;"
-                                        aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
+                        
                             </div>
                         </div>
                     </div>
-                    <!--[ Monthly target ] end-->
-                    <!--[ target pourcentage ] starts-->
                     <div class="col-md-4 col-xl-3">
-                        <div class="card monthly-target">
+                        <div class="card Monthly-sales">
                             <div class="card-block">
-                                <h5 class="mb-4 font-weight-bold">Target Achievement</h5>
+                                <h5 class="mb-4 font-weight-bold">Total Products</h5>
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
-                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>$ 2.942.32
+                                                class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>4109
                                         </h3>
                                     </div>
-                                    <div class="col-3 text-right">
-                                        <p class="m-b-0">36%</p>
-                                    </div>
+                            
                                 </div>
-                                <div class="progress m-t-30" style="height: 7px;">
-                                    <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 35%;"
-                                        aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
+                        
                             </div>
                         </div>
                     </div>
-                    <!--[ target pourcentage ] end-->
+                   
 
-
-
-
-
-                    <div class="col-xl-7">
+                    <div class="col-xl-8">
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="font-weight-bold">Total Purchases By Month</h5>
@@ -166,7 +133,7 @@
                     <div class="col-sm-10">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="font-weight-bold">Top 10 Products In Sales</h5>
+                                <h5 class="font-weight-bold">Top 10 Products In Purchases</h5>
                             </div>
                             <div class="card-block">
                                 <table class="table table-hover table-striped">
@@ -198,7 +165,7 @@
                     <div class="col-xl-7">
                         <div class="card">
                             <div class="card-header">
-                                <h5>Predict</h5>
+                                <h5 class="font-weight-bold">Top 3 Suppliers By Month</h5>
                             </div>
                             <div class="card-block">
                                 <div id="morris-bar-chart" style="height:300px"></div>
@@ -229,15 +196,8 @@
         var Fournisseur = JSON.parse('{{ Fournisseur | escapejs }}');
 
 
-
-
-        var F = Object.keys(Fournisseur[1]).slice(1)
-        console.log(F)
-
-
-
-
-
+        // var F = Object.keys(Fournisseur[0]).slice(1,5)
+        var F = ['KIPROPHA', 'MED 01', 'MED 02', 'MED 10', 'MED 12'];
 
         setTimeout(function () {
 
@@ -254,15 +214,17 @@
                 hideHover: 'auto',
                 responsive: true,
                 labels: ['Purchases'],
-                lineColors: ['#C8329F'],
+                lineColors: ['#04a9f5'],
                 xLabels: 'month',
+                ymin: 150000,
+                ymax:200000,
                 yLabelFormat: function (y) {
                     return y.toString() + ' TND';
                 }
             });
             // [ Total Sales By Month ] end
             // [ Donut-chart ] Start
- var graph = Morris.Donut({
+            var graph = Morris.Donut({
                 element: 'morris-donut-chart',
                 data: categoryPurchases,
                 colors: [
@@ -270,7 +232,7 @@
                     '#C83DE8',
                     '#5971B8',
                     '#531263',
-                     '#538A4D',
+                    '#538A4D',
                 ],
                 resize: true,
                 formatter: function (y, data) {
@@ -280,7 +242,7 @@
             // [ Donut-chart ] end
 
             // [ bar-simple ] chart start
- Morris.Bar({
+            Morris.Bar({
                 element: 'morris-bar-chart',
                 data: Fournisseur,
                 xkey: 'y',

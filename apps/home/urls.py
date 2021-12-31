@@ -11,8 +11,11 @@ urlpatterns = [
     path('sales-forecasting/getEstimatedSalesByRange/', views.getEstimatedSalesByRange, name='api-getestimatedsalesbyrange'),
     path('stock/', views.stock, name='stock'),
     path('purchases/', views.purchases, name='purchases'),
+    path('price-prediction/',views.price_prediction, name='price-prediction' ),
+    path('price-prediction/getPredictedPrice/',views.getPredictedPrice, name='api-getpredictedprice'),
+    path('cnss-classifier/', views.FormView, name='cnss-classifier')
 
-    # Matches any html file
+    # Matches any htnml file
     #re_path(r'^.*\.*', views.pages, name='pages'),
 
 ]

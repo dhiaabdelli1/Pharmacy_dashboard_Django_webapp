@@ -1,0 +1,290 @@
+{% extends "layouts/base.html" %} {% block title %} Price Prediction{% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+
+<link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Price Prediction</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item">Predictive Analysis</li>
+                            <li class="breadcrumb-item"><a href="javascript:">Price Prediction</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card user-list">
+                            <div class="card-header">
+                                <h5>Model Information</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="row align-items-center justify-content-center m-b-20">
+                                    <div class="col-6">
+                                        <h2 class="f-w-200 d-flex align-items-center float-left m-0">Linear Regression
+                                        </h2>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-crosshairs f-15 m-r-10 text-c-yellow"></i>R2 score</h6>
+                                        <h6 class="align-items-center float-right">0.964</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar"
+                                                style="width: 70%;" aria-valuenow="96.4" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-star f-10 m-r-10 text-c-yellow"></i>MAE</h6>
+                                        <h6 class="align-items-center float-right">33.85</h6>
+                                        <div class="m-b-20" style="height: 6px;">
+                                       
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-star f-10 m-r-10 text-c-yellow"></i>RMSE</h6>
+                                        <h6 class="align-items-center float-right">5.81</h6>
+                                
+                                    </div>
+                         
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Price Prediction</h5>
+                            </div>
+                            <div class="card-block col-md-11">
+                                <form>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="formGroupExampleInput">Choose a price</label>
+                                        <input class="form-control" type="text" placeholder="" id='actualprice'>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="formGroupExampleInput">Choose a category</label>
+                                        <select name="libellecategorie" class="form-control" id="exampleFormControlSelect1">
+                                             
+                                            <option value="GTTE" buvable="">GTTE BUVABLE</option>
+                                            
+                                            <option value="SIROP" antitussif="">SIROP ANTITUSSIF</option>
+                                            
+                                            <option value="POMMADE">POMMADE</option>
+                                            
+                                            <option value="CP" antibiotique="">CP ANTIBIOTIQUE</option>
+                                            
+                                            <option value="CP">CP</option>
+                                            
+                                            <option value="COLLUTOIRE">COLLUTOIRE</option>
+                                            
+                                            <option value="SIROP">SIROP</option>
+                                            
+                                            <option value="PDE" opht="">PDE OPHT</option>
+                                            
+                                            <option value="GTTE" nasale="">GTTE NASALE</option>
+                                            
+                                            <option value="SUPPO">SUPPO</option>
+                                            
+                                            <option value="SIROP" antibiotique="">SIROP   ANTIBIOTIQUE</option>
+                                            
+                                            <option value="COLLYRE">COLLYRE</option>
+                                            
+                                            <option value="SACHET" buvable="">SACHET BUVABLE</option>
+                                            
+                                            <option value="GRANULES">GRANULES</option>
+                                            
+                                            <option value="GTTE" auric="">GTTE AURIC</option>
+                                            
+                                            <option value="GYNECO">GYNECO</option>
+                                            
+                                            <option value="TOILETTE">TOILETTE</option>
+                                            
+                                            <option value="LAIT_FARINE">LAIT_FARINE</option>
+                                            
+                                            <option value="DIETETIQUE">DIETETIQUE</option>
+                                            
+                                            <option value="PANSEMENT">PANSEMENT</option>
+                                            
+                                            <option value="DENTAIRE">DENTAIRE</option>
+                                            
+                                            <option value="SERINGUE">SERINGUE</option>
+                                            
+                                            <option value="ACCESS">ACCESS</option>
+                                            
+                                            <option value="SERUM">SERUM</option>
+                                            
+                                            <option value="INJ">INJ</option>
+                                            
+                                            <option value="ORTHOPEDIE">ORTHOPEDIE</option>
+                                            
+                                            <option value="VET">VET</option>
+                                            
+                                            <option value="HYGIENE" intime="">HYGIENE INTIME</option>
+                                            
+                                            <option value="AMP" buvable="">AMP BUVABLE</option>
+                                            
+                                            <option value="GTTE" homeopathie="">GTTE HOMEOPATHIE</option>
+                                            
+                                            <option value="DOSE">DOSE</option>
+                                            
+                                            <option value="INJ" antibiotique="">INJ ANTIBIOTIQUE</option>
+                                            
+                                            <option value="US_EXT">US_EXT</option>
+                                            
+                                            <option value="TEXTILE">TEXTILE</option>
+                                            
+                                            <option value="NATURE">NATURE</option>
+                                            
+                                            <option value="MAISON">MAISON</option>
+                                            
+                                            <option value="VACCIN">VACCIN</option>
+                                            
+                                            <option value="FORMULE">FORMULE</option>
+                                            
+                                            <option value="INHALATION">INHALATION</option>
+                                            
+                                            <option value="SACHET" antibiotique="">SACHET ANTIBIOTIQUE</option>
+                                            
+                                            <option value="PRESERVATIF">PRESERVATIF</option>
+                                            
+                                            <option value="GEL-SOLUTE" buccal="">GEL-SOLUTE BUCCAL</option>
+                                            
+                                            <option value="CP" homeopathie="">CP HOMEOPATHIE</option>
+                                            
+                                            <option value="B." bouche="">B. BOUCHE</option>
+                                            
+                                            <option value="BEBE">BEBE</option>
+                                            
+                                            <option value="TEINTURE" mere="">TEINTURE MERE</option>
+                                            
+                                            <option value="SABOT">SABOT</option>
+                                            
+                                            <option value="Divers">Divers</option>
+                                            
+                                            <option value="CAPSULE">CAPSULE</option>
+                                            
+                                            <option value="RECIP">RECIP</option>
+                                             
+                                        </select>
+
+                                    </div>
+
+                                    <button type="button" class="btn btn-success btn-lg btn-block"
+                                        id="predictbtn">Predict</button>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Prediction Results</h5>
+                            </div>
+                            <div class="card-block">
+                                <h4 id="resultx">No result yet</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% endblock content %}
+
+    <!-- Specific Page JS goes HERE  -->
+
+    {% block javascripts %}
+
+    <script src="/static/assets/plugins/chart-morris/js/raphael.min.js"></script>
+    <script src="/static/assets/plugins/chart-morris/js/morris.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+
+           
+            var predictbtn = document.getElementById('predictbtn');
+            predictbtn.addEventListener('click', (event) => {
+                // console.log(event.target.value);
+                var actualprice = document.getElementById('actualprice');
+                fetch('getPredictedPrice/', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                            'X-CSRFToken': csrftoken,
+                        },
+                        body: JSON.stringify({
+
+                            'post_data': {
+                                actualprice:actualprice.value
+                            }
+                        }) //JavaScript object of data to POST
+                    })
+                    .then(response => {
+                        return response.json() //Convert response to JSON
+                    })
+                    .then(data => {
+                        //Perform actions with the response data from the view
+                        console.log(data);
+                        var s= document.getElementById("resultx")
+                        s.innerHTML = Math.round(data) + ' TND'
+
+                    })
+            });
+
+
+        });
+    </script>
+
+    {% endblock javascripts %}

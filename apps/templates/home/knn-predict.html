@@ -1,0 +1,176 @@
+
+{% extends "layouts/base.html" %} {% block title %} Sales Performance Dashboard {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+
+<link rel="stylesheet" href="/static/assets/plugins/chart-morris/css/morris.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">CNSS Prediction</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                            <li class="breadcrumb-item">Predictive Analysis</li>
+                            <li class="breadcrumb-item"><a href="javascript:">CNSS</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ breadcrumb ] end -->
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card user-list">
+                            <div class="card-header">
+                                <h5 class="font-weight-bold">Model Information</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="row align-items-center justify-content-center m-b-20">
+                                    <div class="col-6">
+                                        <h2 class="f-w-200 d-flex align-items-center float-left m-0 ">KNN Classifier
+                                        </h2>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-crosshairs f-15 m-r-10 text-c-yellow"></i>Accuracy</h6>
+                                        <h6 class="align-items-center float-right">0.9</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar"
+                                                style="width: 90%;" aria-valuenow="90" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-star f-10 m-r-10 text-c-yellow"></i>F1 SCORE</h6>
+                                        <h6 class="align-items-center float-right">0.9</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar"
+                                                style="width: 90%;" aria-valuenow="90" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-star f-10 m-r-10 text-c-yellow"></i>Recall</h6>
+                                        <h6 class="align-items-center float-right">0.9</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar"
+                                                style="width: 90%;" aria-valuenow="90" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <h6 class="align-items-center float-left"><i
+                                                class="fas fa-star f-10 m-r-10 text-c-yellow"></i>Precision</h6>
+                                        <h6 class="align-items-center float-right">0.9</h6>
+                                        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                            <div class="progress-bar progress-c-theme" role="progressbar"
+                                                style="width: 90%;" aria-valuenow="90" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                         
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card ">
+                            <div class="card-header">
+                                <h5 class="font-weight-bold">Total Purchases By Month</h5>
+                            </div>
+                            <div class="card-block">
+                                <form action="/cnss-classifier/" method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label>Total TTC</label>
+                                        <input type="text" name="totalttc" class="form-control" placeholder="Total TTC">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quantité</label>
+                                        <input type="text" name="qte" class="form-control" placeholder="Quantité">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Total Remise</label>
+                                        <input type="text" name="totalremise" class="form-control"
+                                            placeholder="Total Remise">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Catégorie</label>
+                                        <select name="libellecategorie" class="form-control"
+                                            id="exampleFormControlSelect1">
+                                            {% if categs %} {% for i in categs %}
+                                            <option value={{i}}>{{i}}</option>
+                                            {% endfor %} {% endif %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-lg btn-block"
+                                    id="predictbtn">Predict</button>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                   
+                            <div class="card ">
+                                <div class="card-header">
+                                    <h5 class="font-weight-bold">Prediction Result</h5>
+                                </div>
+                                <div class="card-block">
+                                    {%if prediction%}
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            {%if prediction == "False" %}
+                                            Customer doesn't have CNSS</h3>
+                                        <i class="fas fa-circle text-c-red f-10"></i>
+                                        {%else%}
+                                        <i class="fas fa-circle text-c-green f-10" style="margin-right: 20px;"></i>
+                                        Customer has CNSS</h3>
+                                        {%endif%}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+              
+                       
+                    </div>
+                </div>
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+
+
+
+{% endblock javascripts %}
